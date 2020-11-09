@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Test Form Submission</title>
+  </head>
+  <body>
+    <div>
+      <p>
+        <em
+          >[Design a form here to capture the data to send to the database]</em
+        >
+      </p>
+      <form action="https://localhost:3003" id="example-form">
+        <label for="first-name">
+          <strong>First Name:</strong>
+          <input type="text" name="first_name" id="first-name" />
+        </label>
+
+        <label for="last-name">
+          Last Name:
+          <input type="text" name="last_name" id="last-name" />
+        </label>
+
+        <input type="submit" value="Create new user" />
+      </form>
+    </div>
+
+    <script>
+      async function postFormDataAsJson({ url, formData }) {
+        const plainFormData = Object.fromEntries(formData.entries());
+        const formDataJsonString = JSON.stringify(plainFormData);
+
+        const fetchOptions = {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+          body: formDataJsonString,
+        };
+
+        const response = await fetch(url, fetchOptions);
+
+        if (!response.ok) {
+          const errorMessage = await response.text();
+          throw new Error(errorMessage);
+        }
+
+        return response.json();
+      }
+
+      /**
+       * Event handler for a form submit event.
+       * @param {SubmitEvent} event
+       */
+      async function handleFormSubmit(event) {
+        event.preventDefault();
+
+        const form = event.currentTarget;
+        const url = form.action;
+
+        try {
+          const formData = new FormData(form);
+          const responseData = await postFormDataAsJson({ url, formData });
+
+          console.log({ responseData });
+        } catch (error) {
+          console.error(error);
+        }
+      }
+      const exampleForm = document.getElementById("example-form");
+      exampleForm.addEventListener("submit", handleFormSubmit);
+    </script>
+  </body>
+</html>
